@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen >
+	<EditTextPreference xmlns:android="http://schemas.android.com/apk/res/android" 
+	    android:key="pref_max"
+	    android:title="@string/pref_max"
+	    android:summary="@string/pref_max_summ"
+	    android:defaultValue="16" />
+</PreferenceScreen>

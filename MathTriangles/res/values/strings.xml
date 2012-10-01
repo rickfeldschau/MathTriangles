@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Math Triangles</string>
+    <string name="menu_settings">Settings</string>
+    <string name="pref_max">Maximum Number</string>
+    <string name="pref_max_summ">The maximum sum that will be randomly generated.</string>
+    <string name="title_activity_settings">Math Triangles Settings</string>
+    <string name="title_activity_main">Math Triangles</string>
+
+</resources>
