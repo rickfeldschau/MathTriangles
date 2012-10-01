@@ -1,4 +1,6 @@
-package com.circle4.mathtriangles;
+package com.feldschau.mathtriangles;
+
+import com.circle4.mathtriangles.R;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

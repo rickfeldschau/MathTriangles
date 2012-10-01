@@ -1,4 +1,4 @@
-package com.circle4.mathtriangles;
+package com.feldschau.mathtriangles;
 
 import java.util.Random;
 
