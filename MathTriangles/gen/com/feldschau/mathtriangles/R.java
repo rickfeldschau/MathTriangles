@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.circle4.mathtriangles;
+package com.feldschau.mathtriangles;
 
 public final class R {
     public static final class attr {
