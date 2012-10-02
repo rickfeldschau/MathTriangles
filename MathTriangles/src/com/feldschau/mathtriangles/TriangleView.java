@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.view.Display;
@@ -25,7 +26,7 @@ public class TriangleView extends View {
 	private final float STROKE_WIDTH = 5.0f;
 	private final float scaleFactor = 0.87f;
 		
-	private final int MAX_NUMBER = 12;
+	private int MAX_NUMBER = 15;
 	private final int MIN_NUMBER = 2;
 	
 	private int screenHeight;
@@ -41,7 +42,7 @@ public class TriangleView extends View {
 	private int textOffset;
 	private float fontSize = 36.0f;
 	private final int textYAdjustment = 15;
-	
+
 	public boolean isShowingAnswer = false;
 	boolean isAddition = rand.nextBoolean();
 	int sum, lhs, rhs;
@@ -78,14 +79,14 @@ public class TriangleView extends View {
 		originalPoints[1].y = originalPoints[0].y + triangleHeight;	
 		originalPoints[2].x = (int) (originalPoints[0].x + (triangleHeight / TAN_THETA));
 		originalPoints[2].y = originalPoints[1].y;		
+		
+		setBackgroundColor(0xFFFFFFFF);
 	}
 		
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
-		setBackgroundColor(0xFFFFFFFF);
-		
+				
 		if (!isShowingAnswer) {
 			setNewValues();
 		}
@@ -139,6 +140,10 @@ public class TriangleView extends View {
 	
 	public void setNewValues() {
 		isAddition = rand.nextBoolean();
+		
+		MAX_NUMBER = Integer.parseInt(
+				PreferenceManager.getDefaultSharedPreferences(this.getContext())
+				.getString(SettingsActivity.KEY_PREF_MAX_NUMBER, "15"));
 		
 		sum = rand.nextInt(MAX_NUMBER - MIN_NUMBER + 1) + MIN_NUMBER;
 		int temp = rand.nextInt(sum - 1) + 1;
