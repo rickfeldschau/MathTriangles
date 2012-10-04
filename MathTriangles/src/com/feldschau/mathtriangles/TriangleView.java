@@ -39,8 +39,10 @@ public class TriangleView extends View {
 	private int barOffset = 0;
 	
 	private final float TEXT_LOCATION_PERCENTAGE = 0.15f;
+	private final float TEXT_HEIGHT_PERCENTAGE = 0.12f;  // Percent of Triangle Height
 	private int textOffset;
-	private float fontSize = 36.0f;
+//	private final float fontSizeInDip = 27.0f;
+	private float fontSize;
 	private final int textYAdjustment = 15;
 
 	public boolean isShowingAnswer = false;
@@ -74,13 +76,15 @@ public class TriangleView extends View {
 		}
 		
 		originalPoints[0].x = screenWidth / 2;
-		originalPoints[0].y = screenHeight / 2 - triangleHeight * 2 / 3;		// 1/3 triangle height is below screen height midpoint for balance
+		originalPoints[0].y = screenHeight / 2 - triangleHeight * 3 / 4;		// 1/4 triangle height is below screen height midpoint for balance
 		originalPoints[1].x = (int) (originalPoints[0].x - (triangleHeight / TAN_THETA)); 
 		originalPoints[1].y = originalPoints[0].y + triangleHeight;	
 		originalPoints[2].x = (int) (originalPoints[0].x + (triangleHeight / TAN_THETA));
 		originalPoints[2].y = originalPoints[1].y;		
 		
 		setBackgroundColor(0xFFFFFFFF);
+		
+		fontSize = triangleHeight * TEXT_HEIGHT_PERCENTAGE;
 	}
 		
 	@Override
@@ -146,8 +150,8 @@ public class TriangleView extends View {
 				.getString(SettingsActivity.KEY_PREF_MAX_NUMBER, "15"));
 		
 		sum = rand.nextInt(MAX_NUMBER - MIN_NUMBER + 1) + MIN_NUMBER;
-		int temp = rand.nextInt(sum - 1) + 1;
-		lhs = temp > sum - temp ? temp : sum - temp;
+		lhs = rand.nextInt(sum - 1) + 1;
+		
 		rhs = sum - lhs;
 	}	
 	

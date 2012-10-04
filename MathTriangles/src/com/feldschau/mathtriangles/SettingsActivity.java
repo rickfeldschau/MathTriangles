@@ -3,8 +3,10 @@ package com.feldschau.mathtriangles;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.text.InputType;
 
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
@@ -19,6 +21,9 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
 		findPreference(KEY_PREF_MAX_NUMBER).setSummary(prefs.getString(
 				KEY_PREF_MAX_NUMBER,
 				"The maximum sum that will be randomly generated."));
+		
+		EditTextPreference textPref = (EditTextPreference)findPreference(KEY_PREF_MAX_NUMBER);
+		textPref.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,

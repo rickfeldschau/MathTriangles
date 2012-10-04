@@ -40,13 +40,13 @@ public class MainActivity extends Activity implements OnClickListener{
     
     public void onClick(View view) {
 		TriangleView tview = (TriangleView) view;
-
+		
 		tview.isShowingAnswer = !tview.isShowingAnswer;
 
 		if (!tview.isShowingAnswer) {
 			tview.setNewValues();			
 		}
 		tview.setBackgroundColor(0xFFFFFFFF);
-		tview.invalidate();
+		tview.invalidate();		
 	}
 }
