@@ -1,8 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference 
+        	android:title="@string/additionCheckboxTitle"
+        	android:defaultValue="true"
+        	android:key="checkbox_addition"
+        	android:summaryOn="@string/additionOn"
+        	android:summaryOff="@string/additionOff"
+        />
+    <CheckBoxPreference 
+        	android:title="@string/subtractionCheckboxTitle"
+        	android:defaultValue="true"
+        	android:key="checkbox_subtraction"
+        	android:summaryOn="@string/subtractionOn"
+        	android:summaryOff="@string/subtractionOff"
+        />
+    <CheckBoxPreference 
+        	android:title="@string/multiplicationCheckboxTitle"
+        	android:defaultValue="true"
+        	android:key="checkbox_multiplication"
+        	android:summaryOn="@string/multiplicationOn"
+        	android:summaryOff="@string/multiplicationOff"
+        />
+    <CheckBoxPreference 
+        	android:title="@string/divisionCheckboxTitle"
+        	android:defaultValue="true"
+        	android:key="checkbox_division"
+        	android:summaryOn="@string/divisionOn"
+        	android:summaryOff="@string/divisionOff"
+        />
 	<EditTextPreference xmlns:android="http://schemas.android.com/apk/res/android" 
 	    android:key="pref_max"
 	    android:title="@string/pref_max"
 	    
 	    android:defaultValue="15" />
+	<EditTextPreference xmlns:android="http://schemas.android.com/apk/res/android" 
+	    android:key="pref_divisor"
+	    android:title="@string/pref_divisor"
+	    
+	    android:defaultValue="5" />
 </PreferenceScreen>

@@ -1,8 +1,10 @@
 package com.feldschau.mathtriangles;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,7 +13,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,7 +22,7 @@ public class TriangleView extends View {
 	
 	private final double PI = 3.14159;
 	private float HALF_ANGLE;
-	private final float TAN_THETA = (float)FloatMath.sqrt(3);
+	private final float TAN_THETA = (float)Math.sqrt(3);
 	
 	private final float STROKE_WIDTH = 5.0f;
 	private final float scaleFactor = 0.87f;
@@ -41,13 +42,21 @@ public class TriangleView extends View {
 	private final float TEXT_LOCATION_PERCENTAGE = 0.15f;
 	private final float TEXT_HEIGHT_PERCENTAGE = 0.12f;  // Percent of Triangle Height
 	private int textOffset;
-//	private final float fontSizeInDip = 27.0f;
+
 	private float fontSize;
 	private final int textYAdjustment = 15;
 
 	public boolean isShowingAnswer = false;
-	boolean isAddition = rand.nextBoolean();
-	int sum, lhs, rhs;
+	private enum Operation {
+		ADDITION ("+"), SUBTRACTION ("-"), MULTIPLICATION ("x"), DIVISION ("÷");
+		private String symbol;
+		Operation (String symbol) {
+			this.symbol = symbol;
+		}
+		public String symbol() { return symbol; }
+	}
+	private Operation operation;
+	int top, lhs, rhs;
 	
 	@SuppressWarnings("deprecation")
 	public TriangleView(Context context, AttributeSet attrs) {
@@ -85,6 +94,8 @@ public class TriangleView extends View {
 		setBackgroundColor(0xFFFFFFFF);
 		
 		fontSize = triangleHeight * TEXT_HEIGHT_PERCENTAGE;
+		
+		setNewOperation();
 	}
 		
 	@Override
@@ -120,21 +131,21 @@ public class TriangleView extends View {
 		
 		float mpy = (float)(Math.tan(PI / 6)) * (((float)triangleHeight) / ((float)TAN_THETA));
 		
-		canvas.drawText(isAddition ? "+" : "-", 
+		canvas.drawText(operation.symbol(),
 				originalPoints[0].x, 
 				originalPoints[0].y + (triangleHeight - mpy) - (fontSize / 2) + textYAdjustment, 
 				textPaint);
 		// Always draw the left hand side
 		canvas.drawText(Integer.toString(lhs), textTriangle[1].x, textTriangle[1].y, textPaint);  
 				
-		if (isAddition) {
+		if (Operation.ADDITION == operation || Operation.MULTIPLICATION == operation) {
 			canvas.drawText(Integer.toString(rhs), textTriangle[2].x, textTriangle[2].y, textPaint);
 			
 			if (isShowingAnswer) {
-				canvas.drawText(Integer.toString(sum), textTriangle[0].x, textTriangle[0].y, textPaintRed);
+				canvas.drawText(Integer.toString(top), textTriangle[0].x, textTriangle[0].y, textPaintRed);
 			}
 		} else {
-			canvas.drawText(Integer.toString(sum), textTriangle[0].x, textTriangle[0].y, textPaint);
+			canvas.drawText(Integer.toString(top), textTriangle[0].x, textTriangle[0].y, textPaint);
 			
 			if (isShowingAnswer) {
 				canvas.drawText(Integer.toString(rhs), textTriangle[2].x, textTriangle[2].y, textPaintRed);
@@ -143,17 +154,55 @@ public class TriangleView extends View {
 	}
 	
 	public void setNewValues() {
-		isAddition = rand.nextBoolean();
+		setNewOperation();
 		
 		MAX_NUMBER = Integer.parseInt(
 				PreferenceManager.getDefaultSharedPreferences(this.getContext())
 				.getString(SettingsActivity.KEY_PREF_MAX_NUMBER, "15"));
+		if (Operation.ADDITION == operation || Operation.SUBTRACTION == operation) {
+			top = rand.nextInt(MAX_NUMBER - MIN_NUMBER + 1) + MIN_NUMBER; // provides a number between MAX_NUMBER and MIN_NUMBER, inclusive
+			lhs = rand.nextInt(top - 1) + 1;  // number between 1 and sum-1, inclusive
+			
+			rhs = top - lhs;
+		} else {
+			MAX_NUMBER = Integer.parseInt(
+					PreferenceManager.getDefaultSharedPreferences(this.getContext())
+					.getString(SettingsActivity.KEY_PREF_MAX_DIVISOR, "5"));
+			lhs = rand.nextInt(MAX_NUMBER) + 1;
+			rhs = rand.nextInt(MAX_NUMBER) + 1;
+			
+			top = lhs * rhs;			
+		}
+	}
+
+	public void setNewOperation() {		
+		ArrayList<TriangleView.Operation> tempOpList = new ArrayList<TriangleView.Operation>(); 
 		
-		sum = rand.nextInt(MAX_NUMBER - MIN_NUMBER + 1) + MIN_NUMBER;
-		lhs = rand.nextInt(sum - 1) + 1;
+		boolean addition = PreferenceManager.getDefaultSharedPreferences(this.getContext())
+				.getBoolean("checkbox_addition", true);
+		boolean subtraction = PreferenceManager.getDefaultSharedPreferences(this.getContext())
+				.getBoolean("checkbox_subtraction", true);
+		boolean multiplication = PreferenceManager.getDefaultSharedPreferences(this.getContext())
+				.getBoolean("checkbox_multiplication", true);
+		boolean division = PreferenceManager.getDefaultSharedPreferences(this.getContext())
+				.getBoolean("checkbox_division", true);
 		
-		rhs = sum - lhs;
-	}	
+		// check that something is selected, if not, enable addition
+		if (! (addition || subtraction || multiplication || division) ) {
+				Editor e = PreferenceManager.getDefaultSharedPreferences(this.getContext()).edit();
+				e.putBoolean("checkbox_addition", true);
+				e.commit();
+				
+				addition = true;
+		}
+		
+		if(addition) { tempOpList.add(Operation.ADDITION); }
+		if(subtraction) { tempOpList.add(Operation.SUBTRACTION); }
+		if(multiplication) { tempOpList.add(Operation.MULTIPLICATION); }
+		if(division) { tempOpList.add(Operation.DIVISION); }
+		
+		operation = tempOpList.get(rand.nextInt(tempOpList.size()));
+	}
 	
 	private void drawRoundedTriangle(Canvas canvas, int offset) {
 		Point[] tempPoints = getScaledTriangle(offset);
@@ -162,9 +211,9 @@ public class TriangleView extends View {
 		trianglePaint.setColor(Color.BLACK);
 		trianglePaint.setStrokeWidth(STROKE_WIDTH);
 		// Top, Left and Right rounded corners
-		drawCircularArc(canvas, tempPoints[0].x, tempPoints[0].y + 1, (int) (FloatMath.sin(HALF_ANGLE) * offset), 209, 331);
-		drawCircularArc(canvas, tempPoints[1].x, tempPoints[1].y + 1, (int) (FloatMath.sin(HALF_ANGLE) * offset), 89, 211);
-		drawCircularArc(canvas, tempPoints[2].x, tempPoints[2].y + 1, (int) (FloatMath.sin(HALF_ANGLE) * offset), -31, 91);
+		drawCircularArc(canvas, tempPoints[0].x, tempPoints[0].y + 1, (int) (Math.sin(HALF_ANGLE) * offset), 209, 331);
+		drawCircularArc(canvas, tempPoints[1].x, tempPoints[1].y + 1, (int) (Math.sin(HALF_ANGLE) * offset), 89, 211);
+		drawCircularArc(canvas, tempPoints[2].x, tempPoints[2].y + 1, (int) (Math.sin(HALF_ANGLE) * offset), -31, 91);
 		
 		tempPoints = pushPointsToEdge(tempPoints, offset);
 		// See pushPointsToEdge method for tempPoints layout
@@ -219,22 +268,22 @@ public class TriangleView extends View {
 		 */
 		
 		// Left Edge
-		newPoints[0].x = points[0].x - (int) (FloatMath.cos(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
-		newPoints[0].y = points[0].y - (int) (FloatMath.sin(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
-		newPoints[1].x = points[1].x - (int) (FloatMath.cos(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
-		newPoints[1].y = points[1].y - (int) (FloatMath.sin(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
+		newPoints[0].x = points[0].x - (int) (Math.cos(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
+		newPoints[0].y = points[0].y - (int) (Math.sin(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
+		newPoints[1].x = points[1].x - (int) (Math.cos(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
+		newPoints[1].y = points[1].y - (int) (Math.sin(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
 		
 		// Bottom Edge
 		newPoints[2].x = points[1].x;
-		newPoints[2].y = points[1].y + (int) (FloatMath.sin(HALF_ANGLE) * offset);
+		newPoints[2].y = points[1].y + (int) (Math.sin(HALF_ANGLE) * offset);
 		newPoints[3].x = points[2].x;
-		newPoints[3].y = points[2].y + (int) (FloatMath.sin(HALF_ANGLE) * offset);
+		newPoints[3].y = points[2].y + (int) (Math.sin(HALF_ANGLE) * offset);
 		
 		// Right Edge
-		newPoints[4].x = points[0].x + (int) (FloatMath.cos(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
-		newPoints[4].y = points[0].y - (int) (FloatMath.sin(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
-		newPoints[5].x = points[2].x + (int) (FloatMath.cos(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
-		newPoints[5].y = points[2].y - (int) (FloatMath.sin(HALF_ANGLE) * FloatMath.sin(HALF_ANGLE) * offset);
+		newPoints[4].x = points[0].x + (int) (Math.cos(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
+		newPoints[4].y = points[0].y - (int) (Math.sin(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
+		newPoints[5].x = points[2].x + (int) (Math.cos(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
+		newPoints[5].y = points[2].y - (int) (Math.sin(HALF_ANGLE) * Math.sin(HALF_ANGLE) * offset);
 		
 		return newPoints;
 	}

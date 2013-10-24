@@ -2,7 +2,20 @@
 
     <string name="app_name">Math Triangles</string>
     <string name="menu_settings">Settings</string>
-    <string name="pref_max">Maximum Number</string>
+    <string name="pref_max">Maximum Sum</string>
+    <string name="pref_divisor">Maximum Divisor</string>
+    <string name="additionOn">Disable Addition</string>
+    <string name="subtractionOn">Disable Subtraction</string>
+    <string name="multiplicationOn">Disable Multiplication</string>
+    <string name="divisionOn">Disable Division</string>
+    <string name="additionOff">Enable Addition</string>
+    <string name="subtractionOff">Enable Subtraction</string>
+    <string name="multiplicationOff">Enable Multiplication</string>
+    <string name="divisionOff">Enable Division</string>
+    <string name="additionCheckboxTitle">Addition</string>
+    <string name="subtractionCheckboxTitle">Subtraction</string>
+    <string name="multiplicationCheckboxTitle">Multiplication</string>
+    <string name="divisionCheckboxTitle">Division</string>
     <string name="title_activity_settings">Math Triangles Settings</string>
     <string name="title_activity_main">Math Triangles</string>
 
